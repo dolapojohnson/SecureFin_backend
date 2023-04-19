@@ -11,6 +11,9 @@ const validateLoginInput = require("../../validation/login");
 //Load User model
 const User = require("../../models/User");
 
+router.get("/allusers", (req, res) => {
+     return res.status(200).json("I can get all users data")
+})
 
 // .@route POST api/users/register
 // .@desc Register user
@@ -22,9 +25,9 @@ router.post("/register", (req, res) => {
 const { errors, isValid } = validateRegisterInput(req.body);
 
 // Check validation
-     if (!isValid) {
-          return res.status(400).json(errors);
-     }
+     // if (!isValid) {
+     //      return res.status(400).json(errors);
+     // }
 
 User.findOne({ email: req.body.email })
 .then(user => {
@@ -62,15 +65,15 @@ User.findOne({ email: req.body.email })
 // .@access Public
 router.post("/login", (req, res) => {
 // Check validation
-     if (!isValid) {
-          return res.status(400).json(errors);
-     }
+     // if (!isValid) {
+     //      return res.status(400).json(errors);
+     // }
 
      const email = req.body.email;
      const password = req.body.password;
 
 // Find user by email
-     User.findOne({ email})
+     User.findOne({email})
      .then(user => {
           //Check if user exists
           if (!user) {
