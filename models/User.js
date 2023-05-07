@@ -3,35 +3,11 @@ const Schema = mongoose.Schema;
 
 //Create Schema
 const userSchema = new Schema({
-     userName: {
-          type: String,
-          required: true
-     },
-     fullName: {
+     name: {
           type: String,
           required: true
      },
      email: {
-          type: String,
-          required: true
-     },
-     accountNumber: {
-          type: String,
-          required: true
-     },
-     address: {
-          type: String,
-          required: true
-     },
-     phoneNumber: {
-          type: String,
-          required: true
-     },
-     bvn: {
-          type: String,
-          required: true
-     },
-     nin: {
           type: String,
           required: true
      },
