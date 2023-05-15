@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
+const Joi = require('joi');
+const sanitizeHtml = require('sanitize-html');
 
 //Load input validation
 const validateRegisterInput = require("../../validation/register");
@@ -12,11 +14,21 @@ const validateLoginInput = require("../../validation/login");
 const Register = require("../../models/Register");
 const User = require("../../models/User");
 
+const loginSchema = Joi.object({
+     email: Joi.string().required(),
+     password: Joi.string().required()
+})
+
+// Sanitization options for sanitize-html library
+const sanitizeOptions = {
+     allowedTags: [],
+     allowedAttributes: {}
+};
 
 // .@route GET api/users/allusers
 // .@desc Allusers user
 // .@access Public
-router.get("/allusers", (req, res) => {
+router.get("/users", (req, res) => {
      User.find().then((err, data) => {
           if (err) {
                res.json(err)
@@ -82,10 +94,22 @@ router.post("/login", (req, res) => {
      //      return res.status(400).json(errors);
      // }
 
+       // Validate and sanitize the request body
+     const { error, value } = loginSchema.validate(req.body);
+
+     if (error) {
+     // Handle validation errors
+     return res.status(400).json({ error: error.details[0].message });
+     }
+
+     // Access the sanitized values
+     const sanitizedUsername = sanitizeHtml(value.email, sanitizeOptions);
+     const sanitizedPassword = sanitizeHtml(value.password, sanitizeOptions);
+
      const email = req.body.email;
      const password = req.body.password;
 
-// Find user by email
+     // Find user by email
      User.findOne({email})
      .then(user => {
           //Check if user exists
@@ -100,7 +124,7 @@ router.post("/login", (req, res) => {
                //Create JWT Payload
                     const payload = {
                          id: user.id,
-                         name: user.userName
+                         name: user.name
                     };
                //Sign Token
                jwt.sign(
@@ -112,7 +136,8 @@ router.post("/login", (req, res) => {
                     (err, token) => {
                          res.json({
                               success: true,
-                              token: "Bearer " + token
+                              token: "Bearer " + token,
+                              payload
                          });
                     }
                );
